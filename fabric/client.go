@@ -47,7 +47,7 @@ func (c *Client) Connect() error {
 	if err != nil {
 		return err // TODO: wrap this error
 	}
-	chClient, err := channel.New(sdk.ChannelContext(c.Channel, fabsdk.WithOrg(c.Org)))
+	chClient, err := channel.New(sdk.ChannelContext(c.Channel, fabsdk.WithUser(c.Org)))
 	if err != nil {
 		return err
 	}
@@ -63,7 +63,9 @@ func (c *Client) Connect() error {
 // TODO: consider args helpers to avoid [][]byte
 func (c *Client) Invoke(function string, args ...[]byte) ([]byte, error) {
 	if c.channelClient == nil {
-		c.Connect()
+		if err := c.Connect(); err != nil {
+			return nil, err
+		}
 	}
 	response, err := c.channelClient.Query(channel.Request{
 		ChaincodeID: c.Contract,
