@@ -18,7 +18,7 @@ Usage:
 
 The commands are:
 
-	connect        connects to the peer / channel / smart contract specified and persists connection information
+	configure      locally saves the config required to invoke a smart contract
 	invoke         invokes the smart contract subaction specified with the data provided
 
 Use "seamstress help [command]" for more information about a command.
@@ -32,10 +32,12 @@ func main() {
 		cmd = os.Args[1]
 	}
 	switch cmd {
-	case "connect":
-		cmdconnect()
+	case "configure":
+		cmdconfigure()
 	case "invoke":
-		cmdinvoke()
+		function := "todo"
+		args := [][]byte{}
+		cmdinvoke(function, args)
 	case "help":
 		fs := flag.NewFlagSet("help", 0)
 		fs.Parse(os.Args[2:])
