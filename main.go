@@ -35,9 +35,9 @@ func main() {
 	case "configure":
 		cmdconfigure()
 	case "invoke":
-		function := "todo"
-		args := [][]byte{}
-		cmdinvoke(function, args)
+		fs := flag.NewFlagSet("invoke", 0)
+		fs.Parse(os.Args[2:])
+		cmdinvoke(fs.Arg(0), []byte(fs.Arg(1)))
 	case "help":
 		fs := flag.NewFlagSet("help", 0)
 		fs.Parse(os.Args[2:])

@@ -61,14 +61,14 @@ func (c *Client) Connect() error {
 // as arguments to the
 // smart contract function.
 // TODO: consider args helpers to avoid [][]byte
-func (c *Client) Invoke(function string, args [][]byte) ([]byte, error) {
+func (c *Client) Invoke(function string, args ...[]byte) ([]byte, error) {
 	if c.channelClient == nil {
 		c.Connect()
 	}
 	response, err := c.channelClient.Query(channel.Request{
 		ChaincodeID: c.Contract,
 		Fcn:         function,
-		args:        args,
+		Args:        args,
 	})
 	if err != nil {
 		return nil, err

@@ -1,6 +1,9 @@
 package main
 
-import "log"
+import (
+	"log"
+	"os"
+)
 
 func init() {
 	addHelp(
@@ -11,9 +14,13 @@ TODO: add help for invoke command
 	)
 }
 
-func cmdinvoke(function string, args [][]byte) {
+func cmdinvoke(function string, args []byte) {
 	client := readConfig()
-	if err := client.Invoke(function, args); err != nil {
+	b, err := client.Invoke(function, args)
+	if err != nil {
 		log.Fatalln("error invoking smart contract:", err)
+	}
+	if _, err := os.Stdout.Write(b); err != nil {
+		log.Fatalln("error writing to stdout:", err)
 	}
 }

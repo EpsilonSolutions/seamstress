@@ -18,14 +18,20 @@ Set up IBM Blockchain Platform (with CA, Organizations, Peers, Orderer, Channels
 
 Export connection profile and MSP from IBM Blockchain Platform. Console > Organizations > YourOrg > Create connection profile > Select all peers > Download connection profile.
 
-Connect to channel using seamstress:
+Configure seamstress, example:
+```
+$ seamstress configure
+enter filepath to profile:
+./local/Org1msp_profile.json
+enter channel ID:
+channel1
+enter organization name:
+OrgMSP
+enter smart contract ID / chaincode ID:
+simple-contract
+```
 
+Invoke smart contract using seamstress, example creating a key value pair:
 ```
-$ seamstress connect path-to-connection-profile
-connection established (proof: ...)
-```
-
-Invoke smart contract using seamstress:
-```
-seamstress invoke action-name -d '{"data":"values"}'
+seamstress invoke create '{"key":"V31OSDW57K","value":"IRRGjYWnQ9"}'
 ```

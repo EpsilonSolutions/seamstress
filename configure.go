@@ -3,13 +3,13 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"os"
+	"os/user"
 
 	"github.com/EpsilonSolutions/seamstress/fabric"
 )
-
-const localConfigFile = "~/.seamstress"
 
 func init() {
 	addHelp(
@@ -19,7 +19,6 @@ TODO: add help for connect command
 		`,
 	)
 
-	createFileIfNotExists(localConfigFile)
 }
 
 func cmdconfigure() {
@@ -45,32 +44,47 @@ func prompt(msg string) string {
 
 func createFileIfNotExists(filename string) {
 	if _, err := os.Stat(filename); os.IsNotExist(err) {
-		if _, err := os.Create(filename); err != nil {
+		f, err := os.Create(filename)
+		if err != nil {
 			log.Fatalln("unknown filesystem error creating local cache:", err)
 		}
+		f.Close()
 	} else if err != nil {
 		log.Fatalln("unknown filesystem error:", err)
 	}
 }
 
 func readConfig() *fabric.Client {
-	f, err := os.Open(localConfigFile)
+	u, err := user.Current()
 	if err != nil {
-		log.Fatalln("error opening local config file:", err)
+		log.Fatalln("error getting user:", err)
 	}
+
+	contents, err := ioutil.ReadFile(u.HomeDir + "/.seamstress")
+	if err != nil {
+		log.Fatalln("error reading seamstress file:", err)
+	}
+
 	client := fabric.Client{}
-	if err := json.NewDecoder(f).Decode(&client); err != nil {
+	if err := json.Unmarshal(contents, &client); err != nil {
 		log.Fatalln("error writing config to local file:", err)
 	}
+
 	return &client
 }
 
 func writeConfig(client *fabric.Client) {
-	f, err := os.Open(localConfigFile)
+	u, err := user.Current()
 	if err != nil {
-		log.Fatalln("error opening local config file:", err)
+		log.Fatalln("error getting user:", err)
 	}
-	if err := json.NewEncoder(f).Encode(client); err != nil {
-		log.Fatalln("error writing config to local file:", err)
+
+	contents, err := json.Marshal(client)
+	if err != nil {
+		log.Fatalln("error encoding client:", err)
+	}
+
+	if err := ioutil.WriteFile(u.HomeDir+"/.seamstress", contents, 0644); err != nil {
+		log.Fatalln("error writing to seamstress file:", err)
 	}
 }
