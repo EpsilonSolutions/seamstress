@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"log"
 	"os"
 )
 
@@ -27,6 +28,7 @@ Use "seamstress help [command]" for more information about a command.
 }
 
 func main() {
+	log.SetFlags(0)
 	cmd := ""
 	if len(os.Args) > 1 {
 		cmd = os.Args[1]
