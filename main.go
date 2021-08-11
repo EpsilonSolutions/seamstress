@@ -9,12 +9,6 @@ import (
 	"github.com/nats-io/nats.go"
 )
 
-type invocation struct {
-	Function string
-	Args     []byte
-	Ret      chan []byte
-}
-
 func requiredEnv(key string) string {
 	v, ok := os.LookupEnv(key)
 	if !ok {
