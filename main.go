@@ -42,6 +42,7 @@ func main() {
 		fabricPEMPath = requiredEnv("FABRIC_PEM_PATH")
 		fabricKeyPath = defaultEnv("FABRIC_KEY_PATH", "./local/keystore/privateKey")
 
+		// These values are base64 encoded config files
 		fabricConnectionProfileBase64 = requiredEnv("FABRIC_CONNECTION_PROFILE_B64")
 		fabricClientKeyBase64         = requiredEnv("FABRIC_CLIENT_KEY_B64")
 		fabricClientIDBase64          = requiredEnv("FABRIC_CLIENT_ID_B64")
@@ -53,32 +54,74 @@ func main() {
 	requireFile(fabricClientIDBase64, fabricIDPath)
 	requireFile(fabricClientPEMBase64, fabricPEMPath)
 
-	// TODO: consider spinning up a fixed number of greenthread workers
-	w := &worker{
-		fab: &fabric.Client{
-			Profile:  fabricProfilePath,
-			Channel:  fabricChannel,
-			User:     fabricOrg,
-			Org:      fabricOrg,
-			Contract: fabricContract,
-		},
+	log.Println("Config confirmed: TODO show configuration")
+
+	// TODO: configurable max workers
+	maxWorkers := 5
+	workch := make(chan *nats.Msg)
+	for i := 1; i <= maxWorkers; i++ {
+		w := &worker{
+			fab: &fabric.Client{
+				Profile:  fabricProfilePath,
+				Channel:  fabricChannel,
+				User:     fabricOrg,
+				Org:      fabricOrg,
+				Contract: fabricContract,
+			},
+			work: workch,
+		}
+		go w.run()
+	}
+
+	log.Println("Workers launched:", maxWorkers)
+
+	l := listener{
+		prefix:   fabricChannel + "." + fabricContract + ".",
+		worker:   workch,
 		shutdown: make(chan struct{}),
 	}
 
-	log.Println("Worker configured: TODO show configuration")
+	// Intercept system kill signal for graceful shutdown
+	go cleanup(l.shutdown)
 
-	go cleanup(w.shutdown)
-	w.listen(natsURL)
+	log.Println("Listening for NATS messages...")
+
+	l.listen(natsURL)
 
 	log.Println("Exiting")
 }
 
 type worker struct {
-	fab      *fabric.Client
+	fab  *fabric.Client
+	work chan *nats.Msg
+}
+
+func (w *worker) run() {
+	for m := range w.work {
+		w.invoke(m)
+	}
+}
+
+func (w *worker) invoke(m *nats.Msg) {
+	topic := w.fab.Channel + "." + w.fab.Contract + "."
+	ret, err := w.fab.Invoke(m.Subject[len(topic):], m.Data)
+	if err != nil {
+		log.Println("error invoking smart contract:", err)
+	}
+	if err := m.Respond(ret); err == nats.ErrMsgNoReply {
+		// If reply is not set we do nothing
+	} else if err != nil {
+		log.Println("error replying to NATS message:", err)
+	}
+}
+
+type listener struct {
+	prefix   string
+	worker   chan *nats.Msg
 	shutdown chan struct{}
 }
 
-func (w *worker) listen(natsURL string) {
+func (l *listener) listen(natsURL string) {
 	nc, err := nats.Connect(natsURL)
 	if err != nil {
 		// TODO: decide how to poll for NATS
@@ -86,29 +129,20 @@ func (w *worker) listen(natsURL string) {
 		log.Fatalln("error connecting to NATS:", err)
 	}
 
-	topic := w.fab.Channel + "." + w.fab.Contract + "."
-	sub, err := nc.Subscribe(topic+"*", func(m *nats.Msg) {
-		ret, err := w.fab.Invoke(m.Subject[len(topic):], m.Data)
-		if err != nil {
-			log.Println("error invoking smart contract:", err)
-		}
-		if err := m.Respond(ret); err == nats.ErrMsgNoReply {
-			// If reply is not set we do nothing
-		} else if err != nil {
-			log.Println("error replying to NATS message:", err)
-		}
+	sub, err := nc.Subscribe(l.prefix+"*", func(m *nats.Msg) {
+		l.worker <- m
 	})
 	if err != nil {
 		log.Fatalln("error subscribing to NATS topic:", err)
 	}
 
-	<-w.shutdown
+	<-l.shutdown
 	if err := sub.Drain(); err != nil {
 		log.Println("error draining worker on shutdown:", err)
 	}
+	close(l.worker)
 }
 
-// TODO: listen for shutdown instruction
 func cleanup(ch chan struct{}) {
 	// TODO: intercept kill signal from system (i.e. kubernetes)
 	time.Sleep(20 * time.Second)
