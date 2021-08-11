@@ -41,13 +41,17 @@ func main() {
 		fabricIDPath  = requiredEnv("FABRIC_ID_PATH")
 		fabricPEMPath = requiredEnv("FABRIC_PEM_PATH")
 		fabricKeyPath = defaultEnv("FABRIC_KEY_PATH", "./local/keystore/privateKey")
+
+		fabricConnectionProfileBase64 = requiredEnv("FABRIC_CONNECTION_PROFILE_B64")
+		fabricClientKeyBase64         = requiredEnv("FABRIC_CLIENT_KEY_B64")
+		fabricClientIDBase64          = requiredEnv("FABRIC_CLIENT_ID_B64")
+		fabricClientPEMBase64         = requiredEnv("FABRIC_CLIENT_PEM_B64")
 	)
 
-	// TODO: make these paths configurable
-	requireFile("FABRIC_CONNECTION_PROFILE_B64", fabricProfilePath)
-	requireFile("FABRIC_CLIENT_KEY_B64", fabricKeyPath)
-	requireFile("FABRIC_CLIENT_ID_B64", fabricIDPath)
-	requireFile("FABRIC_CLIENT_PEM_B64", fabricPEMPath)
+	requireFile(fabricConnectionProfileBase64, fabricProfilePath)
+	requireFile(fabricClientKeyBase64, fabricKeyPath)
+	requireFile(fabricClientIDBase64, fabricIDPath)
+	requireFile(fabricClientPEMBase64, fabricPEMPath)
 
 	// TODO: consider spinning up a fixed number of greenthread workers
 	w := &worker{

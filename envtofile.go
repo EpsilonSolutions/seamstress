@@ -8,9 +8,8 @@ import (
 	"path/filepath"
 )
 
-func envToFile(env, path string) error {
-	v := os.Getenv(env)
-	b, err := base64.StdEncoding.DecodeString(v)
+func envToFile(b64, path string) error {
+	b, err := base64.StdEncoding.DecodeString(b64)
 	if err != nil {
 		return err
 	}
@@ -20,8 +19,8 @@ func envToFile(env, path string) error {
 	return ioutil.WriteFile(path, b, 0666)
 }
 
-func requireFile(env, path string) {
-	if err := envToFile(env, path); err != nil {
-		log.Fatalln("could not write from", env, "to", path, ". error:", err)
+func requireFile(b64, path string) {
+	if err := envToFile(b64, path); err != nil {
+		log.Fatalln("could not write to", path, ". error:", err)
 	}
 }
