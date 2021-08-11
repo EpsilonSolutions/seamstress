@@ -20,7 +20,7 @@ func envToFile(env, path string) error {
 	return ioutil.WriteFile(path, b, 0666)
 }
 
-func requireFile(env, path string) error {
+func requireFile(env, path string) {
 	if err := envToFile(env, path); err != nil {
 		log.Fatalln("could not write from", env, "to", path, ". error:", err)
 	}
