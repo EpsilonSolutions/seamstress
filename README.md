@@ -37,6 +37,10 @@ Set up IBM Blockchain Platform (with CA, Organizations, Peers, Orderer, Channels
 
 Export connection profile and MSP from IBM Blockchain Platform. Console > Organizations > YourOrg > Create connection profile > Select all peers > Download connection profile.
 
+Update the connection profile to contain all the things that are required but
+are not automatically populated into it for some reason. TODO: add detailed
+documentation on connection profile wrangling.
+
 Configure seamstress, example:
 ```
 $ seamstress configure
@@ -76,4 +80,3 @@ side so this service architecture should be able to deal with backpressure
 too. Putting all of these challenges together and abstracting them into a
 simple function independent worker service frees up other parts of the stack to
 focus on business logic and feature requirements.
-
