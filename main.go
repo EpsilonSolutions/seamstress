@@ -129,9 +129,7 @@ func (l *listener) listen(natsURL string) {
 		log.Fatalln("error connecting to NATS:", err)
 	}
 
-	sub, err := nc.Subscribe(l.prefix+"*", func(m *nats.Msg) {
-		l.worker <- m
-	})
+	sub, err := nc.ChanSubscribe(l.prefix+"*", l.worker)
 	if err != nil {
 		log.Fatalln("error subscribing to NATS topic:", err)
 	}
