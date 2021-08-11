@@ -137,7 +137,7 @@ func (l *listener) listen(natsURL string) {
 	<-l.shutdown
 	// TODO: test this to make sure that drain actually allows us to close the channel
 	if err := sub.Drain(); err != nil {
-		log.Println("error draining worker on shutdown:", err)
+		log.Fatalln("error draining worker on shutdown:", err)
 	}
 	close(l.worker)
 }
