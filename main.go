@@ -3,7 +3,8 @@ package main
 import (
 	"log"
 	"os"
-	"time"
+	"os/signal"
+	"syscall"
 
 	"github.com/EpsilonSolutions/seamstress/fabric"
 	"github.com/nats-io/nats.go"
@@ -143,7 +144,9 @@ func (l *listener) listen(natsURL string) {
 }
 
 func cleanup(ch chan struct{}) {
-	// TODO: intercept kill signal from system (i.e. kubernetes)
-	time.Sleep(20 * time.Second)
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, syscall.SIGINT)
+	<-c
+	log.Println("caught shutdown signal, shutting down gracefully")
 	close(ch)
 }
