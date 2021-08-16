@@ -1,0 +1,21 @@
+version: 3.8
+
+services:
+
+    seamstress:
+        image: seamstress
+        container_name: seamstress1
+        environment: 
+            - NATS_URL=TODO
+            - FABRIC_CHANNEL=channel1
+            - FABRIC_ORG=org1
+            - FABRIC_CONTRACT=simple-contract
+            - FABRIC_CONNECTION_PROFILE_PATH=./local/profile.json
+            - FABRIC_CONNECTION_PROFILE_B64=TODO
+            - FABRIC_KEY_PATH=./local/keystore/privateKey
+            - FABRIC_CLIENT_KEY_B64=TODO
+            - FABRIC_ID_PATH=./local/org1MSPAdmin_identity.json
+            - FABRIC_CLIENT_ID_B64=TODO
+            - FABRIC_PEM_PATH=.local/org1MSP@org1MSP.pem
+            - FABRIC_CLIENT_PEM_B64=TODO
+    
