@@ -16,6 +16,6 @@ services:
             - FABRIC_CLIENT_KEY_B64=TODO
             - FABRIC_ID_PATH=./local/org1MSPAdmin_identity.json
             - FABRIC_CLIENT_ID_B64=TODO
-            - FABRIC_PEM_PATH=.local/org1MSP@org1MSP.pem
+            - FABRIC_PEM_PATH=./local/org1MSP@org1MSP.pem
             - FABRIC_CLIENT_PEM_B64=TODO
     
