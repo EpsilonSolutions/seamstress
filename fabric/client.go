@@ -1,8 +1,8 @@
 package fabric
 
 import (
-	"fmt"
 	"io/ioutil"
+	"log"
 
 	"github.com/hyperledger/fabric-sdk-go/pkg/client/channel"
 	"github.com/hyperledger/fabric-sdk-go/pkg/core/config"
@@ -61,7 +61,7 @@ func (c *Client) Connect() error {
 // as arguments to the
 // smart contract function.
 // TODO: consider args helpers to avoid [][]byte
-func (c *Client) Invoke(function string, args ...[]byte) ([]byte, error) {
+func (c *Client) Invoke(function string, args ...[]byte) (*InvokeResponse, error) {
 	if c.channelClient == nil {
 		if err := c.Connect(); err != nil {
 			return nil, err
@@ -75,5 +75,20 @@ func (c *Client) Invoke(function string, args ...[]byte) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	return []byte(fmt.Sprintf("%#v", response)), nil
+	for _, r := range response.Responses {
+		log.Printf("%+v\n", string(r.Payload))
+	}
+	return &InvokeResponse{
+		ChaincodeStatus:  int(response.ChaincodeStatus),
+		TransactionID:    string(response.TransactionID),
+		TxValidationCode: int(response.TxValidationCode),
+		Payload:          response.Payload,
+	}, nil
+}
+
+type InvokeResponse struct {
+	TransactionID    string
+	ChaincodeStatus  int
+	TxValidationCode int
+	Payload          []byte
 }

@@ -39,7 +39,10 @@ func main() {
 	case "invoke":
 		fs := flag.NewFlagSet("invoke", 0)
 		fs.Parse(os.Args[2:])
-		cmdinvoke(fs.Arg(0), []byte(fs.Arg(1)))
+		if len(fs.Args()) == 0 {
+			log.Fatalln("invoke expects a function name")
+		}
+		cmdinvoke(fs.Arg(0), byteify(fs.Args()[1:])...)
 	case "help":
 		fs := flag.NewFlagSet("help", 0)
 		fs.Parse(os.Args[2:])
@@ -47,4 +50,12 @@ func main() {
 	default:
 		cmdhelp("")
 	}
+}
+
+func byteify(list []string) [][]byte {
+	ret := [][]byte{}
+	for _, x := range list {
+		ret = append(ret, []byte(x))
+	}
+	return ret
 }

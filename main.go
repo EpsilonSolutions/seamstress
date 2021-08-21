@@ -109,7 +109,7 @@ func (w *worker) invoke(m *nats.Msg) {
 	if err != nil {
 		log.Println("error invoking smart contract:", err)
 	}
-	if err := m.Respond(ret); err == nats.ErrMsgNoReply {
+	if err := m.Respond(ret.Payload); err == nats.ErrMsgNoReply {
 		// If reply is not set we do nothing
 	} else if err != nil {
 		log.Println("error replying to NATS message:", err)
