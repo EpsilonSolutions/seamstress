@@ -39,9 +39,8 @@
             "ledgerQuery": true,
             "eventSource": true,
             "x-chaincode": {
-                "simple-contract": {
-                    "version": "0.0.1",
-                    "path": "ibm-bcs-ff808ad67204aa8b087c51de219aa14b2c7f058a0580a8654571165079dbbc76-simple-contract-0.0.1"
+                "Chaincode": {
+                    "version": "1.0.7"
                 }
             }
 		  },
@@ -51,9 +50,8 @@
             "ledgerQuery": true,
             "eventSource": true,
             "x-chaincode": {
-                "simple-contract": {
-                    "version": "0.0.1",
-                    "path": "ibm-bcs-ff808ad67204aa8b087c51de219aa14b2c7f058a0580a8654571165079dbbc76-simple-contract-0.0.1"
+                "Chaincode": {
+                    "version": "1.0.7"
                 }
             }
           },
@@ -63,9 +61,8 @@
             "ledgerQuery": true,
             "eventSource": true,
             "x-chaincode": {
-                "simple-contract": {
-                    "version": "0.0.1",
-                    "path": "ibm-bcs-ff808ad67204aa8b087c51de219aa14b2c7f058a0580a8654571165079dbbc76-simple-contract-0.0.1"
+                "Chaincode": {
+                    "version": "1.0.7"
                 }
             }
           }
